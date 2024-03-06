@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../hook";
 import { pressButton } from "../redux/selectionSlice";
+import { loadSelectedButton, saveSelectedButton } from "../utils/localStorage";
 
 const Selection = (): JSX.Element => {
   const selectedButton = useAppSelector(
@@ -10,6 +12,17 @@ const Selection = (): JSX.Element => {
   const handleButton = (type: string) => {
     dispatch(pressButton(type));
   };
+
+  useEffect(() => {
+    const buttonFromLocalStorage = loadSelectedButton();
+    if (buttonFromLocalStorage) {
+      dispatch(pressButton(buttonFromLocalStorage));
+    }
+  }, []);
+
+  useEffect(() => {
+    saveSelectedButton(selectedButton);
+  }, [selectedButton]);
 
   return (
     <div className="select-wrapper">

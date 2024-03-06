@@ -1,26 +1,28 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../hook";
 import {
   changeTaskTitle,
   deleteTask,
   editTask,
   setIsCompleted,
+  setTasks,
 } from "../redux/listSlice";
+import { loadTasks, saveTasks } from "../utils/localStorage";
 
 const Task = (): JSX.Element => {
   const selectedButton = useAppSelector(
     (state) => state.selection.selectedButton
   );
+  const tasks = useAppSelector((state) => state.list.tasks);
 
   const dispatch = useAppDispatch();
 
-  const tasks = useAppSelector((state) => {
-    if (selectedButton === "completed") {
-      return state.list.tasks.filter((item) => item.completed);
-    } else if (selectedButton === "incompleted") {
-      return state.list.tasks.filter((item) => !item.completed);
-    } else return state.list.tasks;
-  });
+  const filtredTasks =
+    selectedButton === "completed"
+      ? tasks.filter((item) => item.completed)
+      : selectedButton === "incompleted"
+      ? tasks.filter((item) => !item.completed)
+      : tasks;
 
   const changeInput = (id: number, event: ChangeEvent<HTMLInputElement>) => {
     dispatch(changeTaskTitle({ id, newTitle: event.target.value }));
@@ -38,9 +40,20 @@ const Task = (): JSX.Element => {
     dispatch(setIsCompleted({ id, completed: isCompleted }));
   }
 
+  useEffect(() => {
+    const tasksFromLocalStorage = loadTasks();
+    if (tasksFromLocalStorage.length > 0) {
+      dispatch(setTasks(tasksFromLocalStorage));
+    }
+  }, []);
+
+  useEffect(() => {
+    saveTasks(tasks);
+  }, [tasks]);
+
   return (
     <>
-      {tasks.map((item) => (
+      {filtredTasks.map((item) => (
         <div className="task-wrap" key={item.id}>
           <input
             type="checkbox"

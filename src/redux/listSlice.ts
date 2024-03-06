@@ -1,31 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Task } from "../types/taskTypes";
+import { defaultTasks } from "../utils/defaultTasks";
 
 type ListState = {
   tasks: Task[];
 };
 
 const initialState: ListState = {
-  tasks: [
-    {
-      id: 1,
-      title: "shopping",
-      completed: false,
-      editMode: false,
-    },
-    {
-      id: 2,
-      title: "shopping",
-      completed: false,
-      editMode: false,
-    },
-    {
-      id: 3,
-      title: "more shopping",
-      completed: false,
-      editMode: false,
-    },
-  ],
+  tasks: defaultTasks,
 };
 
 export const listSlice = createSlice({
@@ -63,6 +45,9 @@ export const listSlice = createSlice({
           : item
       );
     },
+    setTasks: (state, action: PayloadAction<Task[]>) => {
+      state.tasks = action.payload;
+    },
   },
 });
 
@@ -72,5 +57,6 @@ export const {
   deleteTask,
   editTask,
   setIsCompleted,
+  setTasks,
 } = listSlice.actions;
 export default listSlice.reducer;
